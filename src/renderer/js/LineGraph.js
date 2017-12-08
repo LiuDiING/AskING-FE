@@ -4,15 +4,24 @@ export default {
     extends: Line,
     props:['data'],
     mounted () {
-        this.renderChart({
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'Data One',
-                    backgroundColor: '#f87979',
-                    data: [40, 39, 10, 40, 39, 80, 40]
+        this.renderChart(this.data, {responsive: true, maintainAspectRatio: false, scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    displayFormats: {
+                        'millisecond': 'MMM DD',
+                        'second': 'MMM DD',
+                        'minute': 'MMM DD',
+                        'hour': 'MMM DD',
+                        'day': 'MMM DD',
+                        'week': 'MMM DD',
+                        'month': 'MMM DD',
+                        'quarter': 'MMM DD',
+                        'year': 'MMM DD',
+                    }
                 }
-            ]
-        }, {responsive: true, maintainAspectRatio: false})
+            }],
+        },
+        })
     }
 }

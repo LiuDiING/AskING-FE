@@ -1,7 +1,17 @@
 <template>
-    <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
+    <div>
+    <div style="
+         height: 100%;
+         width: 100%;
+         display: flex;
+         position: fixed;
+         align-items: center;
+         justify-content: center;">
+
+    <Form ref="formInline" :model="formInline" >
+        <p style="font-weight: bold;font-size: 30px;color: rgb(0,0,128);">Welcome to AskING</p>
         <FormItem prop="user">
-            <Input type="text" v-model="formInline.user" placeholder="Username">
+            <Input type="text" v-model="formInline.user" placeholder="Corporate Key">
             <Icon type="ios-person-outline" slot="prepend"></Icon>
             </Input>
         </FormItem>
@@ -11,9 +21,13 @@
             </Input>
         </FormItem>
         <FormItem>
-            <Button type="primary" @click="handleSubmit('formInline')">Signin</Button>
+            <Button type="primary" @click="handleSubmit('formInline')">Log in</Button>
         </FormItem>
     </Form>
+    </div>
+
+    <img style="width: 100px;position: absolute;left: 10px;bottom:10px" src="../../ING_logo.png"/>
+    </div>
 </template>
 
 <script>

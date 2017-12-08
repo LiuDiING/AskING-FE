@@ -1,8 +1,12 @@
 <template>
     <div>
         <div class="layout-header" style="min-height:9vh;max-height: 9vh">
-            <p style="font-weight:bold;font-size: 20px;margin-left:5px">AskING</p>
-            <p style="font-weight: bold; font-size: 10px;margin-left: 5px;">Your personal virtual assistant</p>
+            <p style="color:rgb(0,0,128);font-weight:bold;font-size: 28px;margin-left:5px">AskING</p>
+            <p style="color:rgb(0,0,128);font-weight: bold; font-size: 12px;margin-left: 5px;">Your personal virtual assistant</p>
+            <img style="width: 100px;position: absolute;right: 10px;top:10px" src="../../ING_logo.png"/>
+            <p style="font-style:italic;font-weight:bold;display:inline-block;position: absolute;right: 10px;top:40px;font-size: 12px;color: rgb(0,0,128)">ING Financial Markets</p>
+            <img style="border-radius:50px;width: 50px;position: absolute;right:150px;top: 8px;" src="../../roham.jpg"/>
+            <Button type="error" style="position: absolute;right:220px;top: 20px;" @click = "logOut">log out</Button>
         </div>
         <div id = "container"class="layout" :class="{'layout-hide-text': spanLeft < 5}">
             <div>
@@ -15,35 +19,48 @@
 
                             <!-- Your messages -->
                             <tr>
-                                <td class="bubble">{{a.query}}</td>
+                                <td class="bubble" style="margin-right:20px;font-size: 15px">{{a.query}}</td>
                             </tr>
                             <tr>
-                                <td style="float: left;background-color: orange" class="bubble resposnse">{{a.response}}</td>
+                                <td style="margin-left: 20px;font-size:15px; float: left;background-color: rgb(255,98,0)" class="bubble resposnse">{{a.response}}</td>
                             </tr>
                         </table>
+                        <!--<div v-if="haveHint">hints: {{hints}}</div>-->
                     </div>
 
+
                     <div style="margin:5px;border-color: black;border-style: solid;border-width: 1px;min-height: 5vh;max-height: 5vh">
+                        <!--<Input style="margin:5px;border-color: black;min-height: 5vh;max-height: 5vh" v-model="query" @keyup.enter="submit()" icon="android-send" placeholder="Enter something..." ></Input>-->
                         <div class="wrapper" v-if="micro == false" >
-                            <i class="material-icons iicon" @click="microphone(true)">mic</i>
-                            <input aria-label="Ask me something" autocomplete="off" v-model="query" class="queryform" @keyup.enter="submit()" placeholder="Ask me sooomeng..." autofocus type="text">
+                            <!--<i class="material-icons iicon" @click="microphone(true)">mic</i>-->
+                            <Icon style="bottom:2.5vh;left: 1vh;position: absolute" size="50px" type="android-microphone"></Icon>
+                            <input style="left:2.5vh;position: absolute;bottom:1.75vh;height: 3%;width: 90%" aria-label="Ask me something" autocomplete="off" v-model="query" @keyup.enter="submit()" placeholder="Ask me something..." autofocus type="text">
+
+                            <Icon style="bottom:2.5vh;right: 1vh;position: absolute" v-bind:class="{ active: isSendActive}" type="android-send"></Icon>
+
                         </div>
 
-                        <div class="wrapper" v-else>
-                            <i class="material-icons iicon recording" @click="microphone(false)">mic</i><input class="queryform" :placeholder="speech" readonly>
-                        </div>
+
+                        <!--<div class="wrapper" v-else>-->
+                            <!--<i class="material-icons iicon recording" @click="microphone(false)">mic</i><input class="queryform" :placeholder="speech" readonly>-->
+                        <!--</div>-->
+
                     </div>
 
                     </Col>
 
                     <Col :span="spanRight">
-                    <div id="chartScrollable" style="max-height:92vh;min-height: 92vh;overflow: scroll">
+                    <div id="chartScrollable" style="max-height:89vh;min-height: 89vh;overflow: scroll;border-style: solid;border-width: 1px;margin: 5px">
                     <div v-for = "cd in chartData">
                         <div v-if="cd.type === 'bar'">
                             <bar-example :data = "cd.data"></bar-example>
                         </div>
                         <div v-else-if="cd.type === 'line'">
                             <line-example :data = "cd.data"></line-example>
+                        </div>
+                        <div v-else-if="cd.type === 'table'">
+                            <Table :columns="cd.data.columns1" :data="cd.data.data1"></Table>
+
                         </div>
                     </div>
                     </div>
@@ -82,6 +99,49 @@
         data () {
             return {
                 hostname: '',
+                isSendActive : true,
+                tableData: {
+                columns1: [
+                    {
+                        title: 'Name',
+                        key: 'name'
+                    },
+                    {
+                        title: 'Age',
+                        key: 'age'
+                    },
+                    {
+                        title: 'Address',
+                        key: 'address'
+                    }
+                ],
+                    data1: [
+                {
+                    name: 'John Brown',
+                    age: 18,
+                    address: 'New York No. 1 Lake Park',
+                    date: '2016-10-03'
+                },
+                {
+                    name: 'Jim Green',
+                    age: 24,
+                    address: 'London No. 1 Lake Park',
+                    date: '2016-10-01'
+                },
+                {
+                    name: 'Joe Black',
+                    age: 30,
+                    address: 'Sydney No. 1 Lake Park',
+                    date: '2016-10-02'
+                },
+                {
+                    name: 'Jon Snow',
+                    age: 26,
+                    address: 'Ottawa No. 2 Lake Park',
+                    date: '2016-10-04'
+                }
+            ]
+            },
                 barChartData:{
                     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     datasets: [
@@ -93,11 +153,11 @@
                     ],
 
                 },
-                sessionid: '',
+                sessionId: '',
 
                 sendObject :{
                     question: '',
-                    sessionid: ''
+                    sessionId: ''
                 },
                 protocal: 'http://',
                 apiRoot: '/api/argent',
@@ -113,13 +173,16 @@
                 chartData: [],
                 lineCharts: [],
                 count : 0,
+                query: '',
+                hints: '',
+                haveHint: false,
 
                 speech: 'Go ahead, im listening...',
                 micro: false,
                 muted: false,
                 online: navigator.onLine,
-                spanLeft: 12,
-                spanRight: 12,
+                spanLeft: 8,
+                spanRight: 16,
                 testData :{
                     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                     datasets: [
@@ -137,80 +200,155 @@
                 return this.spanLeft === 5 ? 14 : 24;
             }
         },
-        methods: {
-            submit(){
-                if(this.sessionid === '' || this.sessionid === undefined){
-                    console.log('first time ');
-                    this.$http.post('http://192.168.178.143:8085/api/login',this.query).then((response) => {
-                        this.reponseInformation = response.data;
-                        console.log('response is ' + this.reponseInformation);
-                        if(this.reponseInformation.sessionid != ''){
-                            console.log('session id ' + this.reponseInformation.sessionid);
-                            this.sessionid = this.reponseInformation.sessionid;
-                        }
+        watch: {
+          query :  function () {
+              if(this.query !== ''){
+                  this.isSendActive = true;
+              }
+              else{
+                  this.isSendActive = false;
+              }
+          },
 
-                        var queryAndAnswer = {};
-                        queryAndAnswer.query = this.query;
-                        queryAndAnswer.response = this.reponseInformation;
-                        this.answers.push(queryAndAnswer)
-                        this.handle(response) // <- handle the response in handle() method
-
-                        this.query = ''
-                        this.reponseInformation = ''
-                        var messageBody = document.querySelector('#chatBoxArea');
-                        messageBody.scrollTop = messageBody.scrollHeight;
-                        console.log('scroll height is ' + (messageBody.scrollHeight - messageBody.scrollTop));
-                        messageBody.scrollTop += (messageBody.scrollHeight - messageBody.scrollTop);
-                        console.log(messageBody.scrollTop);
-        })
-
+            hints : function () {
+                if(this.hints === ''){
+                    this.haveHint = false;
                 }
-                else {
-                    this.sendObject.question = this.query;
-                    this.sendObject.sessionid = this.sessionid;
-                    this.$http.post('http://192.168.178.143:8085/api/question', JSON.stringify(this.sendObject)).then((response) => {
+                else{
+                    this.haveHint = true;
+                }
+            }
+        },
+        methods: {
+            logOut(){
+                this.$router.push({
+                    name: 'login-page',
+                })
+                this.sessionId = ''
+            },
+            submit(){
+                if (!(this.query === '')) {
+                if(this.sessionId === '' || this.sessionId === undefined) {
+                    console.log('first time ');
 
-                        this.reponseInformation = response.data;
-
-                        var queryAndAnswer = {};
-                        queryAndAnswer.query = this.query;
-                        queryAndAnswer.response = this.reponseInformation;
-                        this.answers.push(queryAndAnswer)
-//                        this.handle(response) // <- handle the response in handle() method
-
-                        this.query = ''
-                        this.reponseInformation = ''
-                        this.speech = 'Go ahead, im listening...' // <- reset query and speech
-
-                        this.count++;
-                        var newTestChart = {};
-                        if(this.count % 2 === 0) {
-                            console.log('hehe')
-                            newTestChart.type = 'bar';
-                            newTestChart.data = this.testData;
-                            this.chartData.push(newTestChart);
-
-                        }
-                        else {
-                            newTestChart.type = 'line';
-                            newTestChart.data = this.testData;
-                            this.chartData.push(newTestChart);
-                        }
+                        this.$http.post('http://172.16.47.139:8085/api/login', this.query).then((response) => {
+//                            console.log('log should be ' + JSON.stringify(response))
+                            this.reponseInformation = response.data.data;
+                            if (response.data.sessionId != '') {
+                                console.log('session id ' + JSON.stringify(response.data.sessionId));
+                                this.sessionId = response.data.sessionId;
+                            }
 
 
-                        setTimeout(function () {
+                            var queryAndAnswer = {};
+                            queryAndAnswer.query = this.query;
+                            queryAndAnswer.response = this.reponseInformation;
+                            this.answers.push(queryAndAnswer)
+                            this.handle(response) // <- handle the response in handle() method
+
+                            this.query = ''
+                            this.reponseInformation = ''
                             var messageBody = document.querySelector('#chatBoxArea');
                             messageBody.scrollTop = messageBody.scrollHeight;
                             console.log('scroll height is ' + (messageBody.scrollHeight - messageBody.scrollTop));
                             messageBody.scrollTop += (messageBody.scrollHeight - messageBody.scrollTop);
                             console.log(messageBody.scrollTop);
-                            var messageBody2 = document.querySelector('#chartScrollable');
-                            messageBody2.scrollTop = messageBody2.scrollHeight;
+                        })
 
-                        },1500);
+                    }
+                    else {
+                        this.sendObject.question = this.query;
+                        this.sendObject.sessionId = this.sessionId;
+                        console.log('send object is ' + JSON.stringify(this.sendObject));
+                        this.$http.post('http://172.16.47.139:8085/api/question', JSON.stringify(this.sendObject)).then((response) => {
+
+                            console.log('log1 should be ' + JSON.stringify(response))
+
+                            this.reponseInformation = response.data.data;
+//                            console.log('hint is ' + response.data["hint"].length);
+
+                            if((response.data["hint"] !== undefined)) {
+                                if((response.data["hint"].length > 0)){
+                                console.log('I have it!');
+                                this.hints = response.data["hint"];
+                                this.$Notice.open({
+                                    top: 50,
+                                    duration: 3,
+                                    title: 'Hint',
+                                    desc: response.data["hint"]
+                                });
+                                this.haveHint = true;
+                                console.log('this hints are ' + this.hints)
+                            }
+                        }
+
+                            var newTestChart = {};
+                            if(response.data.type === 'chart'){
+
+                                newTestChart.type = 'line';
+                                newTestChart.data = response.data.data;
+                                var newArray = [];
+                                response.data.data.labels.forEach(data => {
+                                    var timestamp = data;
+                                    var t = new Date(timestamp );
+                                    console.log('data label is ' + data);
+                                    console.log('format is ' + t);
+                                    newArray.push(t);
+                                })
+                                newTestChart.data.labels = newArray;
+                                newTestChart.data.datasets.fill = false;
+                                this.chartData.push(newTestChart);
+
+                            }
+                            else {
+
+                                var queryAndAnswer = {};
+                                queryAndAnswer.query = this.query;
+                                queryAndAnswer.response = this.reponseInformation;
+                                this.answers.push(queryAndAnswer)
+//                        this.handle(response) // <- handle the response in handle() method
+
+                                this.query = ''
+                                this.reponseInformation = ''
+                                this.speech = 'Go ahead, im listening...' // <- reset query and speech
+
+                                this.count++;
+//                            var newTestChart = {};
+//                            if (this.count % 3 === 0) {
+//                                console.log('hehe')
+//                                newTestChart.type = 'bar';
+//                                newTestChart.data = this.testData;
+//                                this.chartData.push(newTestChart);
+//
+//                            }
+//                            else if (this.count % 3 === 1) {
+//                                newTestChart.type = 'line';
+//                                newTestChart.data = this.testData;
+//                                this.chartData.push(newTestChart);
+//                            }
+//
+//                            else if (this.count % 3 === 2) {
+//                                newTestChart.type = 'table';
+//                                newTestChart.data = this.tableData;
+//                                this.chartData.push(newTestChart);
+//                            }
+
+                            }
+
+                            setTimeout(function () {
+                                var messageBody = document.querySelector('#chatBoxArea');
+                                messageBody.scrollTop = messageBody.scrollHeight;
+                                console.log('scroll height is ' + (messageBody.scrollHeight - messageBody.scrollTop));
+                                messageBody.scrollTop += (messageBody.scrollHeight - messageBody.scrollTop);
+                                console.log(messageBody.scrollTop);
+                                var messageBody2 = document.querySelector('#chartScrollable');
+                                messageBody2.scrollTop = messageBody2.scrollHeight;
+
+                            }, 1500);
 
 
-                    })
+                        })
+                    }
                 }
             },
 
@@ -540,5 +678,8 @@
     }
     .ivu-col{
         transition: width .2s ease-in-out;
+    }
+    .active {
+        color:green;
     }
 </style>

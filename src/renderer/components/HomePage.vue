@@ -1,9 +1,27 @@
 <template>
   <div>
-    <div v-if="notStarted">
-  <p>AskING</p>
-  <Button type="success" long @click = "goToLoginPage">Get Started</Button>
+    <div style="
+         height: 100%;
+         width: 100%;
+         display: flex;
+         position: fixed;
+         align-items: center;
+         justify-content: center;" v-if="notStarted">
+      <div>
+  <p style="
+    font-size: 50px;
+    font-weight: bold;
+    color:rgb(0,0,128)
+">AskING</p>
+        <p href @click = "goToLoginPage" style="
+    font-size: 30px;
+    font-style: italic;
+    font-weight: bold;
+    color:rgb(0,0,128);
+text-decoration:underline;">Get started></p>
+      </div>
     </div>
+
   <div>
     <router-view></router-view>
   </div>
