@@ -25,7 +25,7 @@
                                 <td style="margin-left: 20px;font-size:15px; float: left;background-color: rgb(255,98,0)" class="bubble resposnse">{{a.response}}</td>
                             </tr>
                         </table>
-                        <div v-for="button in buttonList" style="margin-left: 50px;display: inline-block">
+                        <div v-for="button in buttonList" style="margin-left: 80px;display: inline-block">
                             <Form ref="formInline" :model="formInline" :rules="ruleInline" inline >
                                 <FormItem style="display: inline-block">
                                     <Button @click="buttonInput(button)">{{button}}</Button>
@@ -337,6 +337,11 @@
                                 newTestChart.data = response.data.data;
                                 console.log('table response ' +  JSON.stringify(response.data.data));
                                 this.chartData.push(newTestChart);
+                                var queryAndAnswer = {};
+                                queryAndAnswer.query = this.query;
+                                queryAndAnswer.response = response.data.message;
+                                this.answers.push(queryAndAnswer);
+                                this.query = ''
                             }
                             else {
 
