@@ -6,14 +6,14 @@
             <img style="width: 100px;position: absolute;right: 10px;top:10px" src="../../ING_logo.png"/>
             <p style="font-style:italic;font-weight:bold;display:inline-block;position: absolute;right: 10px;top:40px;font-size: 12px;color: rgb(0,0,128)">ING Financial Markets</p>
             <img style="border-radius:50px;width: 50px;position: absolute;right:150px;top: 8px;" src="../../roham.jpg"/>
-            <Button type="error" style="position: absolute;right:220px;top: 20px;" @click = "logOut">log out</Button>
+            <p STYLE="position: absolute;right:210px;top: 8px;font-style: italic;font-weight: bold;">Welcome, MG19XN</p>
+            <Button type="error" style="position: absolute;right:220px;top: 30px;" @click = "logOut">log out</Button>
         </div>
         <div id = "container"class="layout" :class="{'layout-hide-text': spanLeft < 5}">
             <div>
                 <Row type="flex" >
                     <Col :span="spanLeft">
                     <div id = "chatBoxArea" style="margin:5px;min-height: 84vh;overflow: scroll;max-height: 84vh;border-style: solid;border-color: black;border-width: 1px">
-
 
                         <table v-for="a in answers" class="chat-window">
 
@@ -25,6 +25,14 @@
                                 <td style="margin-left: 20px;font-size:15px; float: left;background-color: rgb(255,98,0)" class="bubble resposnse">{{a.response}}</td>
                             </tr>
                         </table>
+                        <div v-for="button in buttonList" style="margin-left: 50px;display: inline-block">
+                            <Form ref="formInline" :model="formInline" :rules="ruleInline" inline >
+                                <FormItem style="display: inline-block">
+                                    <Button @click="buttonInput(button)">{{button}}</Button>
+                                </FormItem>
+
+                            </Form>
+                        </div>
                         <!--<div v-if="haveHint">hints: {{hints}}</div>-->
                     </div>
 
@@ -52,14 +60,14 @@
                     <Col :span="spanRight">
                     <div id="chartScrollable" style="max-height:89vh;min-height: 89vh;overflow: scroll;border-style: solid;border-width: 1px;margin: 5px">
                     <div v-for = "cd in chartData">
-                        <div v-if="cd.type === 'bar'">
+                        <div style="border-style: dashed; border-color: black;border-width: 1px;margin: 10px" v-if="cd.type === 'bar'">
                             <bar-example :data = "cd.data"></bar-example>
                         </div>
-                        <div v-else-if="cd.type === 'line'">
+                        <div style="border-style: dashed; border-color: black;border-width: 1px;margin: 10px" v-else-if="cd.type === 'line'">
                             <line-example :data = "cd.data"></line-example>
                         </div>
-                        <div v-else-if="cd.type === 'table'">
-                            <Table :columns="cd.data.columns1" :data="cd.data.data1"></Table>
+                        <div style="border-style: dashed; border-color: black;border-width: 1px;margin: 10px" v-else-if="cd.type === 'table'">
+                            <Table :columns="cd.data.header" :data="cd.data.data"></Table>
 
                         </div>
                     </div>
@@ -100,6 +108,7 @@
             return {
                 hostname: '',
                 isSendActive : true,
+                buttonList: [],
                 tableData: {
                 columns1: [
                     {
@@ -220,6 +229,12 @@
             }
         },
         methods: {
+            buttonInput(button){
+              this.query = button;
+              this.submit();
+              this.buttonList = [];
+
+            },
             logOut(){
                 this.$router.push({
                     name: 'login-page',
@@ -267,13 +282,25 @@
                             this.reponseInformation = response.data.data;
 //                            console.log('hint is ' + response.data["hint"].length);
 
+                            console.log('options are ' + JSON.stringify(response.data.option));
+
+                            if(response.data.option !== undefined){
+                                if(response.data.option.length > 0){
+                                    console.log('options are ' + JSON.stringify(response.data.option))
+                                    response.data.option.forEach(button => {
+                                        this.buttonList.push(button);
+                                    })
+
+                                }
+                            }
+
                             if((response.data["hint"] !== undefined)) {
                                 if((response.data["hint"].length > 0)){
                                 console.log('I have it!');
                                 this.hints = response.data["hint"];
                                 this.$Notice.open({
-                                    top: 50,
-                                    duration: 3,
+                                    top: 100,
+                                    duration: 10,
                                     title: 'Hint',
                                     desc: response.data["hint"]
                                 });
@@ -285,20 +312,31 @@
                             var newTestChart = {};
                             if(response.data.type === 'chart'){
 
+                                var queryAndAnswer = {};
+                                queryAndAnswer.query = this.query;
+                                queryAndAnswer.response = response.data.message;
+                                this.answers.push(queryAndAnswer);
+                                this.query = ''
+
                                 newTestChart.type = 'line';
                                 newTestChart.data = response.data.data;
                                 var newArray = [];
                                 response.data.data.labels.forEach(data => {
                                     var timestamp = data;
                                     var t = new Date(timestamp );
-                                    console.log('data label is ' + data);
-                                    console.log('format is ' + t);
                                     newArray.push(t);
                                 })
                                 newTestChart.data.labels = newArray;
                                 newTestChart.data.datasets.fill = false;
                                 this.chartData.push(newTestChart);
 
+                            }
+
+                            else if((response.data.type === 'table') && (typeof(response.data.data) !== 'string')){
+                                newTestChart.type = 'table';
+                                newTestChart.data = response.data.data;
+                                console.log('table response ' +  JSON.stringify(response.data.data));
+                                this.chartData.push(newTestChart);
                             }
                             else {
 
@@ -343,13 +381,15 @@
                                 console.log(messageBody.scrollTop);
                                 var messageBody2 = document.querySelector('#chartScrollable');
                                 messageBody2.scrollTop = messageBody2.scrollHeight;
+                                this.query = ''
 
-                            }, 1500);
+                            }, 500);
 
 
                         })
                     }
                 }
+
             },
 
             drawChart(data){

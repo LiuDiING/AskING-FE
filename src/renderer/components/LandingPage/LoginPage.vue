@@ -10,6 +10,7 @@
 
     <Form ref="formInline" :model="formInline" >
         <p style="font-weight: bold;font-size: 30px;color: rgb(0,0,128);">Welcome to AskING</p>
+        <p style="margin-bottom:10px;text-align:center;font-style:italic;font-weight: bold;font-size: 15px;color: rgb(0,0,128);">Your Personal Assistant</p>
         <FormItem prop="user">
             <Input type="text" v-model="formInline.user" placeholder="Corporate Key">
             <Icon type="ios-person-outline" slot="prepend"></Icon>
